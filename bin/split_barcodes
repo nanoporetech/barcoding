@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+#########
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
+#
+# Copyright (c) 2014 Oxford Nanopore Technologies Ltd.
+#
+# Author:        dturner
+# Last Modified: $Date$
+# Id:            $Id$
+# $HeadURL$
+#
+# Usage: ./split_barcodes <filename> <stringency> (default = 14, lower = more stringent)
+#
+use strict;
+use warnings;
+use Text::LevenshteinXS qw(distance);
+use Bio::SeqIO;
+use Carp;
+use English qw(-no_match_vars);
+use Readonly;
+use Getopt::Long;
+
+our $VERSION = '0.01';
+
+Readonly::Scalar my $SEQ_LENGTH   => 200;
+Readonly::Scalar my $MATCH_WITHIN => 150;
+Readonly::Scalar my $STRINGENCY   => 14;
+
+my $opts = {};
+GetOptions($opts, qw(help));
+
+if($opts->{help}) {
+  print <<"EOT" or croak "Error printing: $ERRNO";
+Usage: $PROGRAM_NAME <filename> <stringency> (default = 14, lower = more stringent)
+EOT
+  exit;
+}
+
+my $infile     = $ARGV[0];
+my $stringency = $ARGV[1] || $STRINGENCY;
+local $RS      = undef;
+my @barcodes   = split /\s+/smx, <DATA>;
+
+my $count = {};
+my $io_in = Bio::SeqIO->new(
+			    -file   => $infile,
+			    -format => 'Fasta',
+			   ) or croak "Could not open '$infile' $ERRNO\n";
+my ($basename) = $infile =~ m{([^\\/]+)$}smx;
+$basename      =~ s{[.]\S+$}{}smx;
+
+for my $bc (@barcodes) {
+  unlink "$basename-$bc.fasta";
+}
+
+while (my $rec = $io_in->next_seq()) {
+  my $header = $rec->id();
+  my $seq    = $rec->seq();
+
+  if (length $seq <= $SEQ_LENGTH) {
+    #########
+    # sequence too short to bother
+    #
+    next;
+  }
+
+  my $min_distance;
+  my $min_bc;
+
+  for my $bc (@barcodes) {
+    my $bc_length  = length $bc;
+    my $revcomp_bc = scalar reverse $bc;
+    $revcomp_bc    =~ tr/[A,T,G,C]/[T,A,C,G]/;
+
+    for my $scan (0 .. $SEQ_LENGTH-$bc_length) { # because I'm filtering for sequences at least $SEQ_LENGTH bases long but the barcode is $bc_length
+      my $window = substr $seq, $scan, $bc_length;
+
+      for my $barcode ($bc, $revcomp_bc) {
+	my $distance = distance($barcode, $window);
+
+	if(!defined $min_distance || $distance < $min_distance) {
+	  $min_distance = $distance;
+	  $min_bc       = $bc;
+	}
+      }
+    }
+  }
+
+  if ($min_distance < $stringency) {
+    my $io_out = Bio::SeqIO->new(
+				 -file   => ">>$basename-${min_bc}.fasta",
+				 -format => 'Fasta',
+				);
+    my $rec    = Bio::Seq->new(
+			       -id  => $header,
+			       -seq => $seq,
+			      );
+    $io_out->write_seq($rec);
+    $io_out->close();
+    $count->{$min_bc}++;
+  }
+}
+
+$io_in->close();
+
+for my $key (sort keys %{$count}) {
+  printf "%s\t%d\n", $key, $count->{$key} or croak qq[Error printing: $ERRNO];
+}
+
+__DATA__
+GGTGCTGAAGAAAGTTGTCGGTGTCTTTGTGTTAACCT
+GGTGCTGTCGATTCCGTTTGTAGTCGTCTGTTTAACCT
+GGTGCTGGAGTCTTGTGTCCCAGTTACCAGGTTAACCT
+GGTGCTGTTCGGATTCTATCGTGTTTCCCTATTAACCT
+GGTGCTGCTTGTCCAGGGTTTGTGTAACCTTTTAACCT
+GGTGCTGTTCTCGCAAAGGCAGAAAGTAGTCTTAACCT
+GGTGCTGGTGTTACCGTGGGAATGAATCCTTTTAACCT
+GGTGCTGTTCAGGGAACAAACCAAGTTACGTTTAACCT
+GGTGCTGAACTAGGCACAGCGAGTCTTGGTTTTAACCT
+GGTGCTGAAGCGTTGAAACCTTTGTCCTCTCTTAACCT
+GGTGCTGGTTTCATCTATCGGAGGGAATGGATTAACCT
+GGTGCTGCAGGTAGAAAGAAGCAGAATCGGATTAACCT

@@ -1,0 +1,13 @@
+bin/split_barcodes
+Build.PL
+Changes
+MANIFEST			This list of files
+README
+README.md
+t/00-changes.t
+t/00-compile-pl.t
+t/00-critic.t
+t/00-distribution.t
+t/00-pod.t
+t/00-podcoverage.t
+t/10-split-barcodes.t
