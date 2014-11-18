@@ -72,3 +72,4 @@
 # Avoid archives of this distribution
 \bportal-[\d\.\_]+
 basecalls_rat.*
+tap-harness-junit.xml

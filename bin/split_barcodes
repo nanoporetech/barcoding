@@ -54,11 +54,33 @@ for my $bc (@barcodes) {
   unlink "$basename-$bc.fasta";
 }
 
-while (my $rec = $io_in->next_seq()) {
-  my $header = $rec->id();
-  my $seq    = $rec->seq();
+#########
+# precompute a few things
+#
+my $bc_lengths  = {};
+my $revcomps    = {};
+my $out_handles = {};
+for my $bc (@barcodes) {
+  $bc_lengths->{$bc} = length $bc;
 
-  if (length $seq <= $SEQ_LENGTH) {
+  my $revcomp_bc   = scalar reverse $bc;
+  $revcomp_bc      =~ tr/[A,T,G,C]/[T,A,C,G]/;
+  $revcomps->{$bc} = $revcomp_bc;
+
+  $out_handles->{$bc} = Bio::SeqIO->new(
+					-file   => ">>$basename-${bc}.fasta",
+					-format => 'Fasta',
+				       );
+}
+
+my $sequences_in = 0;
+while (my $rec = $io_in->next_seq()) {
+  my $header  = $rec->id();
+  my $seq     = $rec->seq();
+  my $seq_len = length $seq;
+  $sequences_in ++;
+
+  if ($seq_len <= $SEQ_LENGTH) {
     #########
     # sequence too short to bother
     #
@@ -68,45 +90,51 @@ while (my $rec = $io_in->next_seq()) {
   my $min_distance;
   my $min_bc;
 
+  #########
+  # iterate over the barcodes we have
+  #
   for my $bc (@barcodes) {
-    my $bc_length  = length $bc;
-    my $revcomp_bc = scalar reverse $bc;
-    $revcomp_bc    =~ tr/[A,T,G,C]/[T,A,C,G]/;
+    my $bc_length  = $bc_lengths->{$bc};
+    my $revcomp_bc = $revcomps->{$bc};
 
-    for my $scan (0 .. $SEQ_LENGTH-$bc_length) { # because I'm filtering for sequences at least $SEQ_LENGTH bases long but the barcode is $bc_length
-      my $window = substr $seq, $scan, $bc_length;
+    #########
+    # only try and match within the first $MATCH_WITHIN bases of the target sequence
+    #
+    for my $scan (0 .. $MATCH_WITHIN) {
+      my $head = substr $seq, $scan, $bc_length;
+      my $tail = substr $seq, $seq_len-$scan, $bc_length;
 
-      for my $barcode ($bc, $revcomp_bc) {
-	my $distance = distance($barcode, $window);
+      for my $window ($head, $tail) {
+	for my $barcode ($bc, $revcomp_bc) {
+	  my $distance = distance($barcode, $window);
 
-	if(!defined $min_distance || $distance < $min_distance) {
-	  $min_distance = $distance;
-	  $min_bc       = $bc;
+	  if(!defined $min_distance || $distance < $min_distance) {
+	    $min_distance = $distance;
+	    $min_bc       = $bc;
+	  }
 	}
       }
     }
   }
 
   if ($min_distance < $stringency) {
-    my $io_out = Bio::SeqIO->new(
-				 -file   => ">>$basename-${min_bc}.fasta",
-				 -format => 'Fasta',
-				);
-    my $rec    = Bio::Seq->new(
-			       -id  => $header,
-			       -seq => $seq,
-			      );
+    my $io_out = $out_handles->{$min_bc};
     $io_out->write_seq($rec);
-    $io_out->close();
     $count->{$min_bc}++;
   }
 }
 
 $io_in->close();
 
+my $sequences_out = 0;
 for my $key (sort keys %{$count}) {
   printf "%s\t%d\n", $key, $count->{$key} or croak qq[Error printing: $ERRNO];
+  $sequences_out += $count->{$key};
 }
+
+printf "Sequences in:  %d\nSequences out: %d\n", $sequences_in, $sequences_out;
+
+1;
 
 __DATA__
 GGTGCTGAAGAAAGTTGTCGGTGTCTTTGTGTTAACCT
