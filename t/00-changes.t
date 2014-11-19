@@ -2,9 +2,9 @@
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
-# Last Modified: $Date: 2014-11-15 00:27:13 +0000 (Sat, 15 Nov 2014) $
-# Id:            $Id: 00-changes.t 44593 2014-11-15 00:27:13Z rpettett $
-# $HeadURL: https://svn.oxfordnanolabs.local/metrichor/branches/prerelease-22.0/portal/t/00-changes.t $
+# Last Modified: $Date$
+# Id:            $Id$
+# $HeadURL$
 #
 package critic;
 use strict;

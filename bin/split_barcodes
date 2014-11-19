@@ -41,12 +41,6 @@ my $infile     = $ARGV[0];
 my $stringency = $ARGV[1] || $STRINGENCY;
 local $RS      = undef;
 my @barcodes   = split /\s+/smx, <DATA>;
-
-my $count = {};
-my $io_in = Bio::SeqIO->new(
-			    -file   => $infile,
-			    -format => 'Fasta',
-			   ) or croak "Could not open '$infile' $ERRNO\n";
 my ($basename) = $infile =~ m{([^\\/]+)$}smx;
 $basename      =~ s{[.]\S+$}{}smx;
 
@@ -74,6 +68,11 @@ for my $bc (@barcodes) {
 }
 
 my $sequences_in = 0;
+my $count        = {};
+my $io_in        = Bio::SeqIO->new(
+				   -file   => $infile,
+				   -format => 'Fasta',
+				  ) or croak "Could not open '$infile' $ERRNO\n";
 while (my $rec = $io_in->next_seq()) {
   my $header  = $rec->id();
   my $seq     = $rec->seq();
@@ -87,7 +86,7 @@ while (my $rec = $io_in->next_seq()) {
     next;
   }
 
-  my $min_distance = 1000;
+  my $min_distance = $SEQ_LENGTH; # arbitrary high number of changes
   my $min_bc;
 
   #########
@@ -108,7 +107,7 @@ while (my $rec = $io_in->next_seq()) {
 	for my $barcode ($bc, $revcomp_bc) {
 	  my $distance = distance($barcode, $window);
 
-	  if($distance < $min_distance) {
+	  if($distance < $min_distance) { ## no critic (ProhibitDeepNests)
 	    $min_distance = $distance;
 	    $min_bc       = $bc;
 	  }
