@@ -6,7 +6,7 @@ This repository is part of the ONT Barcoding Protocol for amplicons.
 Data
 ----
 The dataset (in t/data/) was prepared with two barcodes for illustrative
-purposes. We do not recommend that two barcodes are used generally.
+purposes.
 
 Scripts
 -------
