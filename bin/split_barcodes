@@ -87,7 +87,7 @@ while (my $rec = $io_in->next_seq()) {
     next;
   }
 
-  my $min_distance;
+  my $min_distance = 1000;
   my $min_bc;
 
   #########
@@ -108,7 +108,7 @@ while (my $rec = $io_in->next_seq()) {
 	for my $barcode ($bc, $revcomp_bc) {
 	  my $distance = distance($barcode, $window);
 
-	  if(!defined $min_distance || $distance < $min_distance) {
+	  if($distance < $min_distance) {
 	    $min_distance = $distance;
 	    $min_bc       = $bc;
 	  }
@@ -132,7 +132,7 @@ for my $key (sort keys %{$count}) {
   $sequences_out += $count->{$key};
 }
 
-printf "Sequences in:  %d\nSequences out: %d\n", $sequences_in, $sequences_out;
+printf "Sequences in:  %d\nSequences out: %d\n", $sequences_in, $sequences_out or croak qq[Error printing: $ERRNO];
 
 1;
 
