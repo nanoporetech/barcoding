@@ -1,4 +1,4 @@
-bin/split_barcodes
+bin/split_barcodes.pl
 Build.PL
 Changes
 MANIFEST			This list of files

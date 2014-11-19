@@ -22,7 +22,7 @@ use IO::Capture::Stdout;
   $cap->start;
 
   eval {
-    require("bin/split_barcodes");
+    require("bin/split_barcodes.pl");
   };
 
   $cap->stop;

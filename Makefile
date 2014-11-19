@@ -35,7 +35,7 @@ manifest: clean
 
 clean:
 	touch Build
-	rm -rf Build _build blib cover_db *META* tmp *gz *deb basecalls_rat*fasta
+	rm -rf Build _build blib cover_db *META* tmp *gz *deb basecalls_rat*fasta MANIFEST.SKIP.bak tap-harness-junit.xml
 
 dist:	setup
 	./Build dist
