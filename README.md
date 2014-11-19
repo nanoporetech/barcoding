@@ -14,7 +14,7 @@ Scripts can be found in the bin/ subdirectory.
 
 Prerequisites
 -------------
-The main prerequisites are:
+The main prerequisites are listed below, with a complete list available in Build.PL:
  - Bio::Perl
  - Text::LevenshteinXS
  - Readonly
