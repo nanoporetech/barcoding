@@ -32,7 +32,7 @@ GetOptions($opts, qw(help));
 
 if($opts->{help}) {
   print <<"EOT" or croak "Error printing: $ERRNO";
-Usage: $PROGRAM_NAME <filename> <stringency> (default = 14, lower = more stringent)
+Usage: $PROGRAM_NAME <filename> <stringency> (default = 13, lower = more stringent)
 EOT
   exit;
 }
