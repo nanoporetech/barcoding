@@ -10,7 +10,7 @@
 # Id:            $Id$
 # $HeadURL$
 #
-# Usage: ./split_barcodes <filename> <stringency> (default = 14, lower = more stringent)
+# Usage: ./split_barcodes <filename> <stringency> (default = 13, lower = more stringent)
 #
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ our $VERSION = '0.01';
 
 Readonly::Scalar my $SEQ_LENGTH   => 200;
 Readonly::Scalar my $MATCH_WITHIN => 150;
-Readonly::Scalar my $STRINGENCY   => 14;
+Readonly::Scalar my $STRINGENCY   => 13;
 
 my $opts = {};
 GetOptions($opts, qw(help));
