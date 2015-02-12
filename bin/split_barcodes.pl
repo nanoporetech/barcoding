@@ -6,7 +6,7 @@
 # Copyright (c) 2014 Oxford Nanopore Technologies Ltd.
 #
 # Author:        dturner
-# Last Modified: $Date$
+# Last Modified: $12Feb15$
 # Id:            $Id$
 # $HeadURL$
 #
@@ -21,7 +21,7 @@ use English qw(-no_match_vars);
 use Readonly;
 use Getopt::Long;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 Readonly::Scalar my $SEQ_LENGTH   => 200;
 Readonly::Scalar my $MATCH_WITHIN => 150;
