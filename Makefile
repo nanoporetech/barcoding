@@ -1,17 +1,7 @@
-#########
-# build requirements:
-# build-essential subversion
-# cpan TAP::Harness::JUnit
-#
-SED = sed -r
-
-ifeq ($(shell uname), Darwin)
-  SED = sed -E
-endif
-
-MAJOR ?= 2
-MINOR ?= 22
-PATCH := $(shell svnversion -n . | $(SED) 's/^([0-9]+).*/\1/g')
+MAJOR ?= 1
+MINOR ?= 0
+SUB   ?= 0
+PATCH ?= 0
 
 all: manifest setup
 
@@ -23,9 +13,10 @@ test: setup
 	TEST_AUTHOR=1 ./Build test
 
 cover: manifest setup
-	[ ! -d cover_db ] || rm -rf cover_db
-	HARNESS_PERL_SWITCHES=-MDevel::Cover prove -Ilib t -MDevel::Cover
-	cover -ignore_re t/
+	./Build testcover
+
+versions:
+	find Build.PL bin t -type f -exec perl -i -pe 's/VERSION\s+=\s+q[[\d.]+]/VERSION = q[$(MAJOR).$(MINOR).$(SUB)]/g' {} \;
 
 manifest: clean
 	touch MANIFEST

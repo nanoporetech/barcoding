@@ -1,10 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Author: rmp
 #
 package compile;
 use strict;
@@ -13,7 +10,7 @@ use Test::More;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my @r = (q$Revision: 32328 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = q[1.0.0];
 
 eval {
   require Test::Compile;

@@ -66,6 +66,7 @@ my $builder = $class->new(
                                                  },
                           script_files        => [qw(bin/split_barcodes.pl)],
 #                          sign                => 1,
+                          recursive_test_files => 1,
                           use_tap_harness     => 1,
                           tap_harness_args    => {
                                                   jobs      => 10,

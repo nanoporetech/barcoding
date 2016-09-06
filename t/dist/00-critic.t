@@ -1,10 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Author: rmp
 #
 package critic;
 use strict;
@@ -12,7 +9,7 @@ use warnings;
 use Test::More;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my @r = (q$Revision: 32328 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = q[1.0.0];
 
 if ( not $ENV{TEST_AUTHOR} ) {
   my $msg = 'Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.';

@@ -21,7 +21,7 @@ use English qw(-no_match_vars);
 use Readonly;
 use Getopt::Long;
 
-our $VERSION = '0.02';
+our $VERSION = q[1.0.0];
 
 Readonly::Scalar my $SEQ_LENGTH   => 200;
 Readonly::Scalar my $MATCH_WITHIN => 150;

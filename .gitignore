@@ -1,3 +1,4 @@
+*.fasta
 /blib/
 /.build/
 _build/
@@ -17,3 +18,4 @@ nytprof.out
 /pm_to_blib
 *.o
 *.bs
+tap-harness-junit.xml

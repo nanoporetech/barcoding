@@ -5,15 +5,14 @@
 #
 # Copyright (c) 2014 Oxford Nanopore Technologies Ltd.
 #
-# Author:        dturner
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Author: dturner
 #
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 1;
 use IO::Capture::Stdout;
+
+our $VERSION = q[1.0.0];
 
 {
   local @ARGV = qw(t/data/basecalls_rat.fa);
@@ -26,10 +25,15 @@ use IO::Capture::Stdout;
   };
 
   $cap->stop;
-  my $output = { map { split /\s+/smix, } $cap->read() };
 
-  is((scalar grep { /^[ACTG]+/smx } keys %{$output}), 10, 'correct number of discovered barcodes reported');
-
-  ok($output->{GGTGCTGAAGCGTTGAAACCTTTGTCCTCTCTTAACCT} > 460, 'discovered barcode count');
-  ok($output->{GGTGCTGTTCGGATTCTATCGTGTTTCCCTATTAACCT} > 790, 'discovered barcode count');
+  my $output = { map { split /\s+/smix, } grep { /^[ACTG]+\s/smix } $cap->read() };
+  is_deeply($output,
+	    {
+	     'GGTGCTGGTTTCATCTATCGGAGGGAATGGATTAACCT' => '1',
+	     'GGTGCTGCAGGTAGAAAGAAGCAGAATCGGATTAACCT' => '1',
+	     'GGTGCTGAACTAGGCACAGCGAGTCTTGGTTTTAACCT' => '1',
+	     'GGTGCTGAAGCGTTGAAACCTTTGTCCTCTCTTAACCT' => '442',
+	     'GGTGCTGTTCGGATTCTATCGTGTTTCCCTATTAACCT' => '764',
+	     'GGTGCTGGTGTTACCGTGGGAATGAATCCTTTTAACCT' => '1',
+	    }, 'correct barcode output');
 }
