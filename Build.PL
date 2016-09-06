@@ -12,6 +12,8 @@ use Module::Build;
 use Carp;
 use English qw(-no_match_vars);
 
+our $VERSION = q[1.0.0];
+
 my $class = Module::Build->subclass(
                                     class => 'Module::Build::Barcoding',
                                     code  => <<'SUBCLASS' );
@@ -37,7 +39,7 @@ SUBCLASS
 my $builder = $class->new(
                           module_name         => 'barcoding',
                           dist_author         => 'Dan Turner <dan.turner@nanoporetech.com>',
-                          dist_version        => do { my ($r) = q$Revision: 42050 $ =~ /(\d+)/smx; $r; },
+                          dist_version        => $VERSION,
                           dist_abstract       => q[Barcoding for Amplicons],
                           license             => 'gpl',
                           requires            => {

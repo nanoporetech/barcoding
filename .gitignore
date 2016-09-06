@@ -1,3 +1,4 @@
+barcoding*gz
 *.fasta
 /blib/
 /.build/
