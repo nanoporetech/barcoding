@@ -55,6 +55,7 @@
 
 # Avoid MYMETA files
 ^MYMETA\.
+^META\.
 #!end included /usr/local/lib/perl5/5.18.1/ExtUtils/MANIFEST.SKIP
 
 # Avoid configuration metadata file
