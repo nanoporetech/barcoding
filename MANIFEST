@@ -1,6 +1,7 @@
 bin/split_barcodes.pl
 Build.PL
 Changes
+LICENCE.md
 MANIFEST			This list of files
 README
 README.md
