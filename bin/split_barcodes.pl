@@ -99,7 +99,7 @@ while (my $rec = $io_in->next_seq()) {
   #########
   # iterate over the barcodes we have
   #
-  for my $bcid (keys %{$barcodes}) {
+  for my $bcid (sort keys %{$barcodes}) {
     my $bc         = $barcodes->{$bcid};
     my $bc_length  = $bc_lengths->{$bcid};
     my $revcomp_bc = $revcomps->{$bcid};

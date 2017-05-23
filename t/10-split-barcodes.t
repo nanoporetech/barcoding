@@ -27,7 +27,6 @@ our $VERSION = q[1.0.0];
   $cap->stop;
 
   my $output = { map { split /\s+/smix, } grep { /BC/smix } $cap->read() };
-  use Data::Dumper; diag Dumper($output);
   is_deeply($output,
 	    {
 	     'BC04' => '764',
