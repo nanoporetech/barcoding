@@ -26,14 +26,15 @@ our $VERSION = q[1.0.0];
 
   $cap->stop;
 
-  my $output = { map { split /\s+/smix, } grep { /^[ACTG]+\s/smix } $cap->read() };
+  my $output = { map { split /\s+/smix, } grep { /BC/smix } $cap->read() };
+  use Data::Dumper; diag Dumper($output);
   is_deeply($output,
 	    {
-	     'GGTGCTGGTTTCATCTATCGGAGGGAATGGATTAACCT' => '1',
-	     'GGTGCTGCAGGTAGAAAGAAGCAGAATCGGATTAACCT' => '1',
-	     'GGTGCTGAACTAGGCACAGCGAGTCTTGGTTTTAACCT' => '1',
-	     'GGTGCTGAAGCGTTGAAACCTTTGTCCTCTCTTAACCT' => '442',
-	     'GGTGCTGTTCGGATTCTATCGTGTTTCCCTATTAACCT' => '764',
-	     'GGTGCTGGTGTTACCGTGGGAATGAATCCTTTTAACCT' => '1',
+	     'BC04' => '764',
+	     'BC07' => '1',
+	     'BC09' => '1',
+	     'BC10' => '442',
+	     'BC11' => '1',
+	     'BC12' => '1',
 	    }, 'correct barcode output');
 }

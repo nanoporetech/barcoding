@@ -40,12 +40,18 @@ EOT
 my $infile     = $ARGV[0];
 my $stringency = $ARGV[1] || $STRINGENCY;
 local $RS      = undef;
-my @barcodes   = split /\s+/smx, <DATA>;
+my $barcodes   = {
+		  map {
+		    split /,/smx
+		  }
+		  split /\s+/smx, <DATA>
+		 };
+
 my ($basename) = $infile =~ m{([^\\/]+)$}smx;
 $basename      =~ s{[.]\S+$}{}smx;
 
-for my $bc (@barcodes) {
-  unlink "$basename-$bc.fasta";
+for my $bcid (keys %{$barcodes}) {
+  unlink "$basename-$bcid.fasta";
 }
 
 #########
@@ -54,17 +60,18 @@ for my $bc (@barcodes) {
 my $bc_lengths  = {};
 my $revcomps    = {};
 my $out_handles = {};
-for my $bc (@barcodes) {
-  $bc_lengths->{$bc} = length $bc;
+for my $bcid (keys %{$barcodes}) {
+  my $bc               = $barcodes->{$bcid};
+  $bc_lengths->{$bcid} = length $barcodes->{$bcid};
 
-  my $revcomp_bc   = scalar reverse $bc;
-  $revcomp_bc      =~ tr/[A,T,G,C]/[T,A,C,G]/;
-  $revcomps->{$bc} = $revcomp_bc;
+  my $revcomp_bc       = scalar reverse $bc;
+  $revcomp_bc          =~ tr/[A,T,G,C]/[T,A,C,G]/;
+  $revcomps->{$bcid}   = $revcomp_bc;
 
-  $out_handles->{$bc} = Bio::SeqIO->new(
-					-file   => ">>$basename-${bc}.fasta",
-					-format => 'Fasta',
-				       );
+  $out_handles->{$bcid} = Bio::SeqIO->new(
+					  -file   => ">>$basename-${bcid}.fasta",
+					  -format => 'Fasta',
+					 );
 }
 
 my $sequences_in = 0;
@@ -87,14 +94,15 @@ while (my $rec = $io_in->next_seq()) {
   }
 
   my $min_distance = $SEQ_LENGTH; # arbitrary high number of changes
-  my $min_bc;
+  my $min_bcid;
 
   #########
   # iterate over the barcodes we have
   #
-  for my $bc (@barcodes) {
-    my $bc_length  = $bc_lengths->{$bc};
-    my $revcomp_bc = $revcomps->{$bc};
+  for my $bcid (keys %{$barcodes}) {
+    my $bc         = $barcodes->{$bcid};
+    my $bc_length  = $bc_lengths->{$bcid};
+    my $revcomp_bc = $revcomps->{$bcid};
 
     #########
     # only try and match within the first $MATCH_WITHIN bases of the target sequence
@@ -109,7 +117,7 @@ while (my $rec = $io_in->next_seq()) {
 
 	  if($distance < $min_distance) { ## no critic (ProhibitDeepNests)
 	    $min_distance = $distance;
-	    $min_bc       = $bc;
+	    $min_bcid     = $bcid;
 	  }
 	}
       }
@@ -117,9 +125,9 @@ while (my $rec = $io_in->next_seq()) {
   }
 
   if ($min_distance < $stringency) {
-    my $io_out = $out_handles->{$min_bc};
+    my $io_out = $out_handles->{$min_bcid};
     $io_out->write_seq($rec);
-    $count->{$min_bc}++;
+    $count->{$min_bcid}++;
   }
 }
 
@@ -136,15 +144,15 @@ printf "Sequences in:  %d\nSequences out: %d\n", $sequences_in, $sequences_out o
 1;
 
 __DATA__
-GGTGCTGAAGAAAGTTGTCGGTGTCTTTGTGTTAACCT
-GGTGCTGTCGATTCCGTTTGTAGTCGTCTGTTTAACCT
-GGTGCTGGAGTCTTGTGTCCCAGTTACCAGGTTAACCT
-GGTGCTGTTCGGATTCTATCGTGTTTCCCTATTAACCT
-GGTGCTGCTTGTCCAGGGTTTGTGTAACCTTTTAACCT
-GGTGCTGTTCTCGCAAAGGCAGAAAGTAGTCTTAACCT
-GGTGCTGGTGTTACCGTGGGAATGAATCCTTTTAACCT
-GGTGCTGTTCAGGGAACAAACCAAGTTACGTTTAACCT
-GGTGCTGAACTAGGCACAGCGAGTCTTGGTTTTAACCT
-GGTGCTGAAGCGTTGAAACCTTTGTCCTCTCTTAACCT
-GGTGCTGGTTTCATCTATCGGAGGGAATGGATTAACCT
-GGTGCTGCAGGTAGAAAGAAGCAGAATCGGATTAACCT
+BC01,GGTGCTGAAGAAAGTTGTCGGTGTCTTTGTGTTAACCT
+BC02,GGTGCTGTCGATTCCGTTTGTAGTCGTCTGTTTAACCT
+BC03,GGTGCTGGAGTCTTGTGTCCCAGTTACCAGGTTAACCT
+BC04,GGTGCTGTTCGGATTCTATCGTGTTTCCCTATTAACCT
+BC05,GGTGCTGCTTGTCCAGGGTTTGTGTAACCTTTTAACCT
+BC06,GGTGCTGTTCTCGCAAAGGCAGAAAGTAGTCTTAACCT
+BC07,GGTGCTGGTGTTACCGTGGGAATGAATCCTTTTAACCT
+BC08,GGTGCTGTTCAGGGAACAAACCAAGTTACGTTTAACCT
+BC09,GGTGCTGAACTAGGCACAGCGAGTCTTGGTTTTAACCT
+BC10,GGTGCTGAAGCGTTGAAACCTTTGTCCTCTCTTAACCT
+BC11,GGTGCTGGTTTCATCTATCGGAGGGAATGGATTAACCT
+BC12,GGTGCTGCAGGTAGAAAGAAGCAGAATCGGATTAACCT
